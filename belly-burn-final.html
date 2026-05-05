@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Belly Burn"/>
+<meta name="theme-color" content="#0A0A0F"/>
+<title>Belly Burn 🔥</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap');
+:root{--bg:#0A0A0F;--font:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif;--red:#FF4D4D;--orange:#FF8C00;--yellow:#FFD700;--green:#00E5B0;--blue:#00BFFF;--purple:#A78BFA;--pink:#FF69B4;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:white;font-family:var(--font);min-height:100%;overflow-x:hidden;}
+body{padding-bottom:env(safe-area-inset-bottom);}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+.screen{display:none;min-height:100vh;padding:16px;position:relative;overflow-x:hidden;}
+.screen.active{display:flex;flex-direction:column;align-items:center;}
+#screen-home.active,#screen-goals.active{align-items:stretch;}
+.btn-p{background:linear-gradient(135deg,var(--red),var(--orange));border:none;border-radius:50px;padding:15px 40px;color:white;font-family:var(--font);font-size:1.15rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 8px 28px rgba(255,77,77,.4);}
+.btn-p:active{transform:scale(.97);}
+.btn-s{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:10px 22px;color:rgba(255,255,255,.75);font-family:var(--font);font-size:.9rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-s:active{background:rgba(255,255,255,.14);}
+.bg-dots{position:fixed;inset:0;opacity:.022;background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0;}
+.bg-glow{position:fixed;top:-30%;right:-20%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,77,77,.08) 0%,transparent 70%);pointer-events:none;z-index:0;transition:background .5s;}
+.wrap{max-width:480px;width:100%;margin:0 auto;position:relative;z-index:1;}
+.fade-in{animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.pop{animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.rpulse{animation:rpulse 1s ease-in-out infinite;}
+@keyframes rpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.shimmer{animation:shimmer 2s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.55}}
+/* animations now self-contained inside each SVG <style> tag */
+.stat-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;flex:1;text-align:center;}
+.ex-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;cursor:pointer;transition:all .2s;padding:12px 14px;margin-bottom:8px;}
+.goal-banner{border-radius:18px;padding:16px;margin-bottom:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.week-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:1px solid;transition:all .3s;flex-shrink:0;}
+.prog-bar-bg{width:100%;height:7px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+.prog-bar{height:100%;border-radius:4px;transition:width .5s ease;}
+#timer-svg{transform:rotate(-90deg);}
+#timer-track{fill:none;stroke:rgba(255,255,255,.07);}
+#timer-fill{fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+.qdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);transition:all .35s;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(20,20,30,.95);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:12px 24px;font-size:.85rem;font-weight:600;letter-spacing:.5px;z-index:999;transition:transform .35s cubic-bezier(.34,1.2,.64,1);white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a24;border-top:1px solid rgba(255,255,255,.1);padding:14px 20px;z-index:900;align-items:center;gap:12px;}
+#install-banner.visible{display:flex;}
+#settings-overlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
+#settings-overlay.open{display:flex;}
+#settings-sheet{width:100%;max-width:480px;background:#14141E;border-top:1px solid rgba(255,255,255,.12);border-radius:22px 22px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .38s cubic-bezier(.34,1.1,.64,1);}
+#settings-overlay.open #settings-sheet{transform:translateY(0);}
+.hmap{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px;}
+.hcell{aspect-ratio:1/1;border-radius:4px;}
+.wu-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,176,.12);border:1px solid rgba(0,229,176,.3);border-radius:20px;padding:4px 14px;font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--green);}
+#notif-sel{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;color:white;font-family:var(--font);font-size:.9rem;outline:none;cursor:pointer;}
+#notif-sel option{background:#14141E;}
+</style>
+</head>
+<body>
+<div class="bg-dots"></div>
+<div class="bg-glow" id="bg-glow"></div>
+<div id="toast"></div>
+
+<div class="screen active" id="screen-home">
+<div class="wrap fade-in">
+  <div style="text-align:center;padding-top:20px;margin-bottom:18px;position:relative;">
+    <button onclick="openSettings()" aria-label="Impostazioni" style="position:absolute;right:0;top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:36px;height:36px;color:rgba(255,255,255,.45);cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;">&#x2699;&#xFE0F;</button>
+    <div style="font-size:2.6rem;margin-bottom:4px;">&#x1F525;</div>
+    <div style="font-size:.65rem;letter-spacing:4px;color:var(--red);font-weight:700;margin-bottom:8px;text-transform:uppercase;">Programma Quotidiano</div>
+    <h1 style="font-size:clamp(2.2rem,10vw,3.5rem);font-weight:900;line-height:1;margin-bottom:8px;">
+      BELLY<br><span style="-webkit-text-stroke:1px rgba(255,255,255,.22);color:transparent;">BURN</span>
+    </h1>
+    <p style="color:rgba(255,255,255,.38);font-size:.85rem;font-family:var(--body);font-weight:300;line-height:1.65;">5&ndash;7 minuti al giorno &middot; Uomo 43+ &middot; Grasso viscerale</p>
+  </div>
+  <div style="display:flex;gap:9px;margin-bottom:16px;">
+    <div class="stat-card"><div style="font-size:1.6rem;font-weight:900;" id="stat-sessions">0</div><div style="font-size:.6rem;color:rgba(255,255,255,.33);letter-spacing:1px;margin-top:1px;">TOTALI</div></div>
+    <div class="stat-card"><div style="font-size:1.6rem;font-weight:900;color:var(--orange);" id="stat-streak">0&#x1F525;</div><div style="font-size:.6rem;color:rgba(255,255,255,.33);letter-spacing:1px;margin-top:1px;">STREAK</div></div>
+    <div class="stat-card"><div style="font-size:1.6rem;font-weight:900;color:var(--yellow);" id="stat-badges">0&#x1F3C5;</div><div style="font-size:.6rem;color:rgba(255,255,255,.33);letter-spacing:1px;margin-top:1px;">BADGE</div></div>
+    <div class="stat-card" id="stat-today-card" style="display:none;"><div style="font-size:1.6rem;font-weight:900;color:var(--blue);" id="stat-today">0</div><div style="font-size:.6rem;color:rgba(255,255,255,.33);letter-spacing:1px;margin-top:1px;">OGGI &#x1F501;</div></div>
+  </div>
+  <div class="goal-banner" id="goal-banner" onclick="showScreen('goals')"></div>
+  <div id="done-today-msg" style="display:none;background:rgba(0,229,176,.09);border:1px solid rgba(0,229,176,.28);border-radius:12px;padding:9px 16px;margin-bottom:14px;color:var(--green);font-size:.8rem;font-family:var(--body);text-align:center;">&#x2705; Allenamento completato oggi!</div>
+  <div style="text-align:center;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <button class="btn-p" id="start-btn" onclick="startWorkout()">Inizia ora</button>
+    <button onclick="openSpotify()" title="Scegli musica su Spotify" style="background:#1DB954;border:none;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(29,185,84,.4);flex-shrink:0;transition:transform .2s;" onmouseenter="this.style.transform='scale(1.08)'" onmouseleave="this.style.transform='scale(1)'">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 11-.277-1.215c3.809-.87 7.076-.496 9.712 1.115.294.18.387.563.207.857zm1.224-2.72a.78.78 0 01-1.072.257c-2.687-1.652-6.786-2.131-9.966-1.166a.78.78 0 01-.966-.519.781.781 0 01.52-.966c3.632-1.102 8.147-.568 11.228 1.328a.78.78 0 01.256 1.066zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.937.937 0 11-.543-1.793c3.532-1.072 9.404-.865 13.115 1.338a.937.937 0 01-.954 1.614z"/></svg>
+    </button>
+  </div>
+  <div id="spotify-panel" style="display:none;background:rgba(29,185,84,.07);border:1px solid rgba(29,185,84,.25);border-radius:18px;padding:14px 16px;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span style="font-size:.65rem;font-weight:700;letter-spacing:2px;color:#1DB954;">&#x1F3A7; PLAYLIST WORKOUT</span>
+      <button onclick="document.getElementById('spotify-panel').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:1.1rem;">&#x2715;</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;" id="spotify-list"></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(29,185,84,.15);text-align:center;">
+      <a href="https://open.spotify.com/search/workout" target="_blank" rel="noopener" style="font-size:.7rem;color:rgba(29,185,84,.7);font-family:var(--body);text-decoration:none;">Cerca altre playlist su Spotify &#x2192;</a>
+    </div>
+  </div>
+  <div id="week-prog-info"></div>
+  <div id="heatmap-wrap" style="margin-bottom:18px;"></div>
+  <div style="font-size:.6rem;letter-spacing:3px;color:rgba(255,255,255,.24);margin-bottom:10px;text-transform:uppercase;">&#x1F446; Tocca per vedere l'animazione</div>
+  <div id="exercise-list"></div>
+  <div style="height:30px;"></div>
+</div>
+</div>
+
+<div class="screen" id="screen-workout" style="justify-content:center;">
+<div class="wrap fade-in" style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+  <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
+    <button class="btn-s" style="padding:7px 15px;font-size:.72rem;" onclick="showScreen('home');stopTimer()">&#x2190; Esci</button>
+    <div style="font-size:.66rem;letter-spacing:2px;color:rgba(255,255,255,.3);" id="ex-counter">1 / 7</div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:4px 11px;font-size:.7rem;color:rgba(255,255,255,.4);" id="time-left-label">~6min</div>
+  </div>
+  <div class="prog-bar-bg" style="height:3px;"><div class="prog-bar" id="session-bar" style="background:linear-gradient(90deg,var(--red),var(--orange));width:0%;"></div></div>
+  <div id="rest-panel" style="display:none;text-align:center;flex-direction:column;align-items:center;gap:10px;">
+    <div class="rpulse" style="font-size:2.4rem;">&#x1F62E;&#x200D;&#x1F4A8;</div>
+    <div style="font-size:.6rem;letter-spacing:4px;color:var(--green);font-weight:700;">RIPOSO</div>
+    <div style="font-size:5rem;font-weight:900;line-height:1;color:var(--green);" id="rest-count">15</div>
+    <div id="next-ex-preview" style="display:flex;flex-direction:column;align-items:center;gap:5px;"></div>
+    <div id="rest-next-desc" style="display:none;max-width:300px;color:rgba(255,255,255,.33);font-family:var(--body);font-size:.78rem;line-height:1.6;padding:0 8px;text-align:center;"></div>
+    <button class="btn-s" onclick="skipRest()" style="margin-top:4px;">Salta &#x2192;</button>
+  </div>
+  <div id="active-panel" style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;">
+    <div id="wu-badge" class="wu-badge" style="display:none;">&#x1F321;&#xFE0F; RISCALDAMENTO</div>
+    <div style="position:relative;width:185px;height:185px;">
+      <svg id="timer-svg" width="185" height="185" viewBox="0 0 185 185">
+        <circle id="timer-track" cx="92.5" cy="92.5" r="80" stroke-width="11"/>
+        <circle id="timer-fill" cx="92.5" cy="92.5" r="80" stroke-width="11" stroke="var(--red)" stroke-dasharray="502.65" stroke-dashoffset="0"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+        <div style="font-size:3rem;font-weight:900;line-height:1;" id="timer-display">40</div>
+        <div style="font-size:.56rem;letter-spacing:2px;color:rgba(255,255,255,.33);margin-top:2px;">secondi</div>
+      </div>
+    </div>
+    <div id="anim-window" style="border-radius:16px;padding:12px 16px;display:flex;align-items:center;justify-content:center;width:100%;min-height:90px;transition:background .4s,border-color .4s;"></div>
+    <div style="text-align:center;">
+      <div style="font-size:.58rem;letter-spacing:3px;font-weight:700;margin-bottom:3px;" id="ex-target-label"></div>
+      <h2 style="font-size:clamp(1.5rem,5vw,2rem);font-weight:900;" id="ex-name-display"></h2>
+      <p style="color:rgba(255,255,255,.42);font-family:var(--body);font-size:.82rem;line-height:1.6;margin-top:6px;max-width:330px;" id="ex-desc-display"></p>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn-s" id="pause-btn" onclick="togglePause()">&#x23F8; Pausa</button>
+      <button class="btn-s" onclick="skipExercise()">Salta &#x2192;</button>
+      <button class="btn-s" id="mute-btn" onclick="toggleMute()" style="padding:10px 14px;" title="Muto">&#x1F50A;</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;" id="progress-dots"></div>
+</div>
+</div>
+
+<div class="screen" id="screen-complete" style="justify-content:center;">
+<div class="wrap fade-in" style="text-align:center;">
+  <div class="pop" style="font-size:3.5rem;margin-bottom:10px;" id="complete-icon">&#x1F3C6;</div>
+  <div style="font-size:.6rem;letter-spacing:4px;color:var(--green);font-weight:700;margin-bottom:7px;">COMPLETATO</div>
+  <h2 style="font-size:clamp(1.9rem,7vw,2.8rem);font-weight:900;margin-bottom:12px;" id="complete-title">OTTIMO<br>LAVORO!</h2>
+  <div id="badge-unlock-banner" style="display:none;border-radius:18px;padding:18px;margin-bottom:16px;">
+    <div style="font-size:1.9rem;margin-bottom:4px;">&#x1F3C5;</div>
+    <div style="font-size:1rem;font-weight:800;" id="badge-name"></div>
+    <div style="font-size:.76rem;color:rgba(255,255,255,.45);font-family:var(--body);margin-top:3px;" id="badge-week"></div>
+  </div>
+  <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap;">
+    <div style="flex:1;background:rgba(255,140,0,.09);border:1px solid rgba(255,140,0,.28);border-radius:16px;padding:13px 8px;text-align:center;">
+      <div style="font-size:1.9rem;font-weight:900;color:var(--orange);" id="c-streak">0</div>
+      <div style="font-size:.6rem;letter-spacing:1px;color:rgba(255,255,255,.36);margin-top:2px;">STREAK</div>
+    </div>
+    <div style="flex:1;border-radius:16px;padding:13px 8px;text-align:center;" id="c-goal-card">
+      <div style="font-size:1.9rem;font-weight:900;" id="c-goal">0/0</div>
+      <div style="font-size:.6rem;letter-spacing:1px;color:rgba(255,255,255,.36);margin-top:2px;">OBIETTIVO</div>
+    </div>
+    <div style="flex:1;background:rgba(0,191,255,.09);border:1px solid rgba(0,191,255,.28);border-radius:16px;padding:13px 8px;text-align:center;">
+      <div style="font-size:1.9rem;font-weight:900;color:var(--blue);" id="c-today">1&#x1F501;</div>
+      <div style="font-size:.6rem;letter-spacing:1px;color:rgba(255,255,255,.36);margin-top:2px;">OGGI</div>
+    </div>
+    <div style="flex:1;background:rgba(255,215,0,.09);border:1px solid rgba(255,215,0,.28);border-radius:16px;padding:13px 8px;text-align:center;">
+      <div style="font-size:1.9rem;font-weight:900;color:var(--yellow);" id="c-badges">0</div>
+      <div style="font-size:.6rem;letter-spacing:1px;color:rgba(255,255,255,.36);margin-top:2px;">BADGE</div>
+    </div>
+  </div>
+  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px;margin-bottom:12px;" id="complete-week-card"></div>
+  <div style="background:rgba(0,229,176,.07);border:1px solid rgba(0,229,176,.2);border-radius:14px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+    <span style="font-size:1.6rem;">&#x1F525;</span>
+    <div><div style="font-size:1.7rem;font-weight:900;color:var(--green);" id="c-kcal">~55</div><div style="font-size:.58rem;letter-spacing:1px;color:rgba(255,255,255,.33);">KCAL STIMATE</div></div>
+    <div style="font-size:.68rem;color:rgba(255,255,255,.22);font-family:var(--body);flex:1;line-height:1.4;">calcolate su durata e intensit&agrave; per uomo 43+</div>
+  </div>
+  <div style="display:flex;gap:9px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn-p" onclick="startWorkout()" style="padding:13px 30px;font-size:1rem;">Ripeti</button>
+    <button class="btn-s" onclick="showScreen('goals')">Obiettivi</button>
+    <button class="btn-s" onclick="showScreen('home')">Home</button>
+  </div>
+  <div style="padding:15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;font-family:var(--body);font-size:.75rem;color:rgba(255,255,255,.28);line-height:1.85;text-align:left;">
+    <strong style="color:rgba(255,255,255,.44);display:block;margin-bottom:3px;">&#x1F4A1; Consigli extra</strong>
+    Camminata 30 min/giorno &middot; Riduci zuccheri e alcol &middot; Dormi 7&ndash;8 ore &middot; Mangia in una finestra di 10 ore
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-goals">
+<div class="wrap fade-in">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;margin-bottom:22px;">
+    <button class="btn-s" style="padding:7px 15px;font-size:.72rem;" onclick="showScreen('home')">&#x2190; Home</button>
+    <h2 style="font-size:1.4rem;font-weight:900;letter-spacing:1px;">OBIETTIVI</h2>
+    <div style="width:72px;"></div>
+  </div>
+  <div id="goals-current-week" style="border-radius:20px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"></div>
+  <div style="font-size:.62rem;letter-spacing:3px;color:rgba(255,255,255,.25);margin-bottom:12px;text-transform:uppercase;">Percorso completo &mdash; 8 settimane</div>
+  <div id="goals-timeline"></div>
+  <div style="height:30px;"></div>
+</div>
+</div>
+
+<div id="install-banner">
+  <div style="flex:1;font-family:var(--body);font-size:.85rem;line-height:1.4;">
+    <strong>Aggiungi alla Home</strong><br>
+    <span style="color:rgba(255,255,255,.45);font-size:.75rem;">Usa come app, funziona offline</span>
+  </div>
+  <button class="btn-s" id="install-btn" style="font-size:.78rem;padding:8px 18px;">Installa</button>
+  <button onclick="document.getElementById('install-banner').classList.remove('visible')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1.2rem;padding:0 4px;">&#x2715;</button>
+</div>
+
+<div id="settings-overlay" onclick="closeSettings(event)">
+  <div id="settings-sheet">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:0 auto 16px;"></div>
+      <h3 style="font-size:1.2rem;font-weight:900;letter-spacing:2px;">&#x2699;&#xFE0F; IMPOSTAZIONI</h3>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:.58rem;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:10px;text-transform:uppercase;">&#x1F4BE; Backup Dati</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-s" onclick="exportState()" style="flex:1;font-size:.82rem;">&#x2B07;&#xFE0F; Esporta</button>
+        <button class="btn-s" onclick="importState()" style="flex:1;font-size:.82rem;">&#x2B06;&#xFE0F; Importa</button>
+      </div>
+      <div style="font-size:.68rem;color:rgba(255,255,255,.2);font-family:var(--body);margin-top:6px;line-height:1.5;">Salva streak, badge e storico sessioni come file JSON.</div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:.58rem;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:10px;text-transform:uppercase;">&#x1F514; Promemoria Giornaliero</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="notif-sel" onchange="setNotifHour(+this.value)"></select>
+        <button class="btn-s" onclick="requestNotif()" style="font-size:.82rem;padding:10px 16px;white-space:nowrap;">Attiva</button>
+      </div>
+      <div id="notif-status" style="font-size:.7rem;color:rgba(255,255,255,.3);font-family:var(--body);margin-top:7px;"></div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.07);margin:4px 0 20px;"></div>
+    <button onclick="resetProgram()" style="width:100%;background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.28);border-radius:50px;padding:13px;color:var(--red);font-family:var(--font);font-size:.95rem;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;">&#x1F5D1;&#xFE0F; Reimposta Programma</button>
+  </div>
+</div>
+
+<script>
+var EXERCISES=[
+  {id:1,name:"Mountain Climbers",duration:40,rest:15,emoji:"\uD83C\uDFD4\uFE0F",desc:"In posizione di plank, porta le ginocchia al petto alternando velocemente. Mantieni i fianchi bassi.",target:"Addome, cardio",color:"#FF4D4D"},
+  {id:2,name:"Plank",duration:45,rest:15,emoji:"\uD83E\uDDF1",desc:"Posizione push-up sugli avambracci. Corpo diritto come una tavola, contrai forte l'addome.",target:"Core profondo",color:"#FF8C00"},
+  {id:3,name:"Bicycle Crunches",duration:40,rest:15,emoji:"\uD83D\uDEB4",desc:"Sdraiato, mani dietro la testa. Porta il gomito destro al ginocchio sinistro e viceversa.",target:"Obliqui, basso ventre",color:"#FFD700"},
+  {id:4,name:"Leg Raises",duration:35,rest:15,emoji:"\uD83E\uDDB5",desc:"Sdraiato, gambe tese. Alzale a 90\u00B0 e abbassale lentamente senza toccare il suolo.",target:"Basso ventre",color:"#00E5B0"},
+  {id:5,name:"High Knees",duration:35,rest:15,emoji:"\uD83D\uDD25",desc:"Corri sul posto portando le ginocchia piu\u2019 in alto possibile. Braccia al ritmo delle gambe.",target:"Cardio, core",color:"#00BFFF"},
+  {id:6,name:"Dead Bug",duration:40,rest:15,emoji:"\uD83D\uDC1B",desc:"Sdraiato, braccia verso il soffitto. Abbassa braccio dx + gamba sx simultaneamente, poi inverti.",target:"Core profondo, stabilita\u2019",color:"#A78BFA"},
+  {id:7,name:"Russian Twists",duration:35,rest:10,emoji:"\uD83C\uDF00",desc:"Seduto a 45\u00B0, gambe sollevate. Ruota il busto a dx e sx con le mani giunte davanti.",target:"Obliqui, grasso viscerale",color:"#FF69B4"}
+];
+var WEEKLY_GOALS=[
+  {week:1,title:"Primo Passo",icon:"\uD83C\uDF31",desc:"Completa almeno 3 sessioni questa settimana.",target:3,reward:"Badge Principiante",color:"#00E5B0"},
+  {week:2,title:"Prendi il Ritmo",icon:"\uD83D\uDD04",desc:"Completa almeno 4 sessioni e mantieni lo streak.",target:4,reward:"Badge Costanza",color:"#00BFFF"},
+  {week:3,title:"Met\u00E0 Strada",icon:"\u26A1",desc:"Completa 5 sessioni \u2014 il corpo inizia ad adattarsi.",target:5,reward:"Badge Progressione",color:"#A78BFA"},
+  {week:4,title:"Settimana di Fuoco",icon:"\uD83D\uDD25",desc:"Completa 6 sessioni su 7. Quasi perfetto!",target:6,reward:"Badge Guerriero",color:"#FF8C00"},
+  {week:5,title:"Settimana Perfetta",icon:"\uD83D\uDC8E",desc:"7 giorni su 7. Zero eccezioni. Massimo impegno.",target:7,reward:"Badge Diamante",color:"#FFD700"},
+  {week:6,title:"Campione",icon:"\uD83C\uDFC6",desc:"2 settimane perfette consecutive. Sei una macchina.",target:7,reward:"Badge Campione",color:"#FF4D4D"},
+  {week:7,title:"Oltre i Limiti",icon:"\uD83D\uDE80",desc:"Mantieni 7/7 e supera 40 giorni totali di streak.",target:7,reward:"Badge Leggenda",color:"#FF69B4"},
+  {week:8,title:"Stile di Vita",icon:"\uD83C\uDF1F",desc:"La routine e\u2019 parte di te. Completa tutte le sessioni.",target:7,reward:"Badge Stile di Vita",color:"#00E5B0"}
+];
+/* FIX #2 */
+var TOTAL_DURATION=EXERCISES.reduce(function(a,e){return a+e.duration+e.rest;},0)
+                  -EXERCISES[EXERCISES.length-1].rest;
+
+/* FIX #10 — RISCALDAMENTO 3x30s */
+var WARMUP=[
+  {id:'w1',name:'Respirazione Profonda',duration:30,emoji:'\uD83E\uDEB4',
+   desc:'Inspira dal naso 4s, trattieni 2s, espira dalla bocca 6s. Senti la pancia espandersi.',
+   target:'Attivazione, controllo del respiro',color:'#00E5B0'},
+  {id:'w2',name:'Rotazioni Busto',duration:30,emoji:'\uD83D\uDD04',
+   desc:'In piedi, piedi alla larghezza delle spalle. Ruota il busto a destra e sinistra con le braccia aperte.',
+   target:'Mobilit\u00E0 colonna, obliqui',color:'#00BFFF'},
+  {id:'w3',name:'Marcia sul Posto',duration:30,emoji:'\uD83D\uDEB6',
+   desc:'Cammina sul posto alzando bene le ginocchia. Dondola le braccia al ritmo. Aumenta gradualmente il passo.',
+   target:'Cardio lieve, attivazione',color:'#A78BFA'}
+];
+
+/* FIX #5 — +5% durata per ogni settimana */
+function scaledDuration(ex){
+  return Math.round(ex.duration*(1+(state.currentWeek-1)*0.05));
+}
+/* FIX #2 aggiornato: include warm-up e scaledDuration */
+function calcTotalDuration(){
+  var wu=WARMUP.reduce(function(a,e){return a+e.duration;},0);
+  var main=EXERCISES.reduce(function(a,e){return a+scaledDuration(e)+e.rest;},0)
+           -EXERCISES[EXERCISES.length-1].rest;
+  return wu+main;
+}
+/* FIX #12 — ~7 kcal/min HIIT moderato uomo 43+ */
+function calcCalories(){return Math.round((calcTotalDuration()/60)*7);}
+var CIRCUMFERENCE=2*Math.PI*80;
+var state={streak:0,lastDone:null,totalSessions:0,currentWeek:1,appStartDate:null,weekSessions:0,earnedBadges:[],todayCount:0,todayDate:null,
+           isMuted:false,       /* FIX #4 */
+           sessionDates:[],     /* FIX #6: heatmap */
+           notifHour:-1};       /* FIX #9: promemoria */
+var wk={exIdx:0,timeLeft:0,isRest:false,isPaused:false,totalElapsed:0,timerInterval:null,openPreview:-1,
+        phase:'main'};          /* FIX #10: 'warmup'|'main' */
+
+function saveState(){localStorage.setItem('bb_state',JSON.stringify(state));}
+
+function todayStr(){return new Date().toISOString().split('T')[0];}
+
+/* Returns which week number (1-based) we are in, based on app first-open date */
+function calcCurrentWeek(startDate){
+  var start=new Date(startDate);start.setHours(0,0,0,0);
+  var now=new Date();now.setHours(0,0,0,0);
+  var days=Math.floor((now-start)/(1000*60*60*24));
+  return Math.min(Math.floor(days/7)+1,WEEKLY_GOALS.length);
+}
+
+/* Returns the ISO date string of the Monday of week `weekNum` from startDate */
+function weekStartFor(startDate,weekNum){
+  var d=new Date(startDate);
+  d.setDate(d.getDate()+(weekNum-1)*7);
+  return d.toISOString().split('T')[0];
+}
+
+function loadState(){
+  try{
+    var s=JSON.parse(localStorage.getItem('bb_state')||'{}');
+    if(s.streak!==undefined)Object.assign(state,s);
+    /* FIX #1 — migra date salvate nel vecchio formato toDateString() → ISO */
+    function normalizeDate(d){
+      if(!d)return null;
+      if(/^\d{4}-\d{2}-\d{2}$/.test(d))return d;
+      try{var p=new Date(d);if(!isNaN(p.getTime()))return p.toISOString().split('T')[0];}catch(e){}
+      return null;
+    }
+    state.lastDone=normalizeDate(state.lastDone);
+    state.todayDate=normalizeDate(state.todayDate);
+    if(!state.sessionDates)state.sessionDates=[];
+    if(state.notifHour===undefined)state.notifHour=-1;
+    /* First ever launch: record today as the start date */
+    if(!state.appStartDate){
+      state.appStartDate=todayStr();
+      state.currentWeek=1;
+      state.weekSessions=0;
+      saveState();
+      return;
+    }
+    /* Calculate which week we are in now */
+    var correctWeek=calcCurrentWeek(state.appStartDate);
+    if(correctWeek!==state.currentWeek){
+      /* New week has started — reset session counter, advance week */
+      state.currentWeek=correctWeek;
+      state.weekSessions=0;
+      saveState();
+    }
+  }catch(e){}
+}
+function goalOf(w){return WEEKLY_GOALS[Math.min(w,WEEKLY_GOALS.length)-1];}
+function hasBadge(w){return state.earnedBadges.indexOf(w)>=0;}
+function showToast(msg,color){
+  var t=document.getElementById('toast');t.textContent=msg;t.style.color=color||'var(--green)';
+  t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);
+}
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('screen-'+name).classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='home') renderHome();
+  if(name==='goals') renderGoals();
+  if(name==='complete') renderComplete();
+}
+/* FIX #10 — SVG animati warm-up */
+function svgForWarmup(id,color){
+  var sk='#F2A86A',sh='#0E8A72',so='#0F0F22',fl='#080812';
+  var R='stroke-linecap="round" stroke-linejoin="round"';
+  if(id==='w1') return '<svg viewBox="0 0 200 128" width="200" height="128" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>.brth{transform-origin:100px 80px;animation:brth 4s ease-in-out infinite}@keyframes brth{0%,100%{transform:scale(.42);opacity:.18}50%{transform:scale(1);opacity:.42}}</style>'
+    +'<circle cx="100" cy="80" r="50" fill="'+color+'" class="brth"/>'
+    +'<circle cx="100" cy="28" r="13" fill="'+sk+'"/>'
+    +'<line x1="100" y1="42" x2="100" y2="80" stroke="'+sh+'" stroke-width="18" '+R+'/>'
+    +'<line x1="91" y1="54" x2="63" y2="68" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'<line x1="109" y1="54" x2="137" y2="68" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'<line x1="93" y1="80" x2="82" y2="110" stroke="'+so+'" stroke-width="11" '+R+'/>'
+    +'<line x1="107" y1="80" x2="118" y2="110" stroke="'+so+'" stroke-width="11" '+R+'/>'
+    +'</svg>';
+  if(id==='w2') return '<svg viewBox="0 0 200 128" width="200" height="128" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>.rot{transform-origin:100px 68px;animation:rot 1.7s ease-in-out infinite}@keyframes rot{0%,100%{transform:rotate(-26deg)}50%{transform:rotate(26deg)}}</style>'
+    +'<line x1="93" y1="82" x2="76" y2="112" stroke="'+so+'" stroke-width="12" '+R+'/>'
+    +'<line x1="107" y1="82" x2="124" y2="112" stroke="'+so+'" stroke-width="12" '+R+'/>'
+    +'<g class="rot">'
+    +'<circle cx="100" cy="28" r="13" fill="'+sk+'"/>'
+    +'<line x1="100" y1="42" x2="100" y2="82" stroke="'+sh+'" stroke-width="18" '+R+'/>'
+    +'<line x1="91" y1="56" x2="53" y2="70" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'<line x1="109" y1="56" x2="147" y2="70" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'</g></svg>';
+  return '<svg viewBox="0 0 130 152" width="130" height="152" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>'
+    +'.ml{transform-origin:57px 90px;animation:mla .65s ease-in-out infinite}@keyframes mla{0%,100%{transform:rotate(5deg)}50%{transform:rotate(-52deg)}}'
+    +'.mr{transform-origin:73px 90px;animation:mra .65s ease-in-out infinite .325s}@keyframes mra{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(-52deg)}}'
+    +'.al{transform-origin:54px 56px;animation:ala .65s ease-in-out infinite .325s}@keyframes ala{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(28deg)}}'
+    +'.ar{transform-origin:76px 56px;animation:ara .65s ease-in-out infinite}@keyframes ara{0%,100%{transform:rotate(14deg)}50%{transform:rotate(-28deg)}}'
+    +'</style>'
+    +'<circle cx="65" cy="24" r="13" fill="'+sk+'"/>'
+    +'<line x1="65" y1="38" x2="65" y2="88" stroke="'+sh+'" stroke-width="22" stroke-linecap="round"/>'
+    +'<g class="al"><line x1="54" y1="56" x2="36" y2="76" stroke="'+sk+'" stroke-width="10" '+R+'/></g>'
+    +'<g class="ar"><line x1="76" y1="56" x2="94" y2="76" stroke="'+sk+'" stroke-width="10" '+R+'/></g>'
+    +'<g class="ml"><line x1="57" y1="90" x2="48" y2="117" stroke="'+so+'" stroke-width="12" '+R+'/><line x1="48" y1="117" x2="46" y2="140" stroke="'+sk+'" stroke-width="10" '+R+'/><ellipse cx="46" cy="144" rx="12" ry="5" fill="'+fl+'"/></g>'
+    +'<g class="mr"><line x1="73" y1="90" x2="82" y2="117" stroke="'+so+'" stroke-width="12" '+R+'/><line x1="82" y1="117" x2="84" y2="140" stroke="'+sk+'" stroke-width="10" '+R+'/><ellipse cx="84" cy="144" rx="12" ry="5" fill="'+fl+'"/></g>'
+    +'</svg>';
+}
+function svgFor(id,color){
+  var sk='#F2A86A',hr='#2E1004',sh='#0E8A72',so='#0F0F22',fl='#080812';
+  var R='stroke-linecap="round" stroke-linejoin="round"';
+  /* Head: front-facing, r=16 default. Hair cap + glasses + beard */
+  function H(cx,cy,r){r=r||16;
+    var lw=r-1,lh=Math.round(r*0.4);
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+sk+'"/>'
+      /* hair */
+      +'<path d="M'+(cx-r)+','+(cy-2)+' C'+(cx-r-1)+','+(cy-r*2.1)+' '+(cx+r+1)+','+(cy-r*2.1)+' '+(cx+r)+','+(cy-2)+' C'+(cx+r-5)+','+(cy-r*1.15)+' '+(cx-r+5)+','+(cy-r*1.15)+' '+(cx-r)+','+(cy-2)+'Z" fill="'+hr+'"/>'
+      /* glasses left */
+      +'<rect x="'+(cx-r+2)+'" y="'+(cy-4)+'" width="'+lw+'" height="'+lh+'" rx="2" fill="rgba(180,220,255,0.18)" stroke="'+hr+'" stroke-width="1.7"/>'
+      /* glasses right */
+      +'<rect x="'+(cx+2)+'" y="'+(cy-4)+'" width="'+lw+'" height="'+lh+'" rx="2" fill="rgba(180,220,255,0.18)" stroke="'+hr+'" stroke-width="1.7"/>'
+      /* bridge */
+      +'<line x1="'+(cx-1)+'" y1="'+(cy-2)+'" x2="'+(cx+2)+'" y2="'+(cy-2)+'" stroke="'+hr+'" stroke-width="1.1"/>'
+      /* beard */
+      +'<path d="M'+(cx-r+3)+','+(cy+4)+' Q'+cx+','+(cy+r*1.5)+' '+(cx+r-3)+','+(cy+4)+' Q'+(cx+r-5)+','+(cy+r*1.15)+' '+cx+','+(cy+r*1.25)+' Q'+(cx-r+5)+','+(cy+r*1.15)+' '+(cx-r+3)+','+(cy+4)+'Z" fill="'+hr+'" opacity="0.92"/>';
+  }
+  var svgs={};
+
+  /* ═══ 1: MOUNTAIN CLIMBERS — plank, knee drives forward ═══ */
+  svgs[1]='<svg viewBox="0 0 220 110" width="220" height="110" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>.a{transform-box:fill-box;transform-origin:0% 0%;animation:kd .72s ease-in-out infinite}@keyframes kd{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-68deg)}}</style>'
+    +'<line x1="8" y1="102" x2="212" y2="102" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* hands on ground */
+    +'<ellipse cx="18" cy="80" rx="9" ry="5" fill="'+sk+'"/>'
+    +'<ellipse cx="42" cy="76" rx="9" ry="5" fill="'+sk+'"/>'
+    /* arms */
+    +'<line x1="50" y1="60" x2="18" y2="80" stroke="'+sk+'" stroke-width="13" '+R+'/>'
+    +'<line x1="53" y1="62" x2="42" y2="76" stroke="'+sk+'" stroke-width="12" '+R+'/>'
+    /* torso — teal shirt */
+    +'<line x1="50" y1="59" x2="164" y2="49" stroke="'+sh+'" stroke-width="23" '+R+'/>'
+    /* shorts at hip */
+    +'<line x1="150" y1="51" x2="168" y2="50" stroke="'+so+'" stroke-width="26" '+R+'/>'
+    /* back leg (faded, static) */
+    +'<line x1="168" y1="51" x2="188" y2="70" stroke="'+so+'" stroke-width="12" '+R+' opacity="0.4"/>'
+    +'<line x1="188" y1="70" x2="196" y2="88" stroke="'+sk+'" stroke-width="10" '+R+' opacity="0.4"/>'
+    +'<ellipse cx="200" cy="93" rx="13" ry="5" fill="'+fl+'" opacity="0.35"/>'
+    /* animated front leg — pivot at hip (168,50) */
+    +'<g transform="translate(168,50)"><g class="a">'
+    +'<line x1="0" y1="0" x2="18" y2="20" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="18" y1="20" x2="26" y2="40" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="29" cy="45" rx="13" ry="5" fill="'+fl+'"/>'
+    +'</g></g>'
+    +H(28,37)
+    +'<line x1="5" y1="22" x2="17" y2="22" stroke="'+color+'" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>'
+    +'<line x1="7" y1="31" x2="17" y2="31" stroke="'+color+'" stroke-width="1.4" stroke-linecap="round" opacity="0.32"/>'
+    +'</svg>';
+
+  /* ═══ 2: PLANK — forearm plank, body breathes ═══ */
+  svgs[2]='<svg viewBox="0 0 220 100" width="220" height="100" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>'
+    +'.b1{transform-box:fill-box;transform-origin:50% 50%;animation:b1a 2.2s ease-in-out infinite}@keyframes b1a{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.09)}}'
+    +'.b2{animation:b2a 2.2s ease-in-out infinite}@keyframes b2a{0%,100%{opacity:.04}50%{opacity:.38}}'
+    +'</style>'
+    +'<line x1="8" y1="93" x2="212" y2="93" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    +'<ellipse cx="112" cy="72" rx="70" ry="7" fill="'+color+'" class="b2"/>'
+    +'<g class="b1">'
+    /* forearms on ground */
+    +'<line x1="16" y1="78" x2="52" y2="78" stroke="'+sk+'" stroke-width="14" '+R+'/>'
+    +'<line x1="38" y1="78" x2="70" y2="78" stroke="'+sk+'" stroke-width="12" '+R+'/>'
+    +'<ellipse cx="15" cy="78" rx="9" ry="5" fill="'+sk+'"/>'
+    +'<ellipse cx="37" cy="78" rx="8" ry="5" fill="'+sk+'"/>'
+    /* elbows up to shoulders */
+    +'<line x1="52" y1="78" x2="56" y2="62" stroke="'+sk+'" stroke-width="13" '+R+'/>'
+    +'<line x1="70" y1="78" x2="73" y2="64" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    /* teal shirt body */
+    +'<line x1="54" y1="61" x2="170" y2="55" stroke="'+sh+'" stroke-width="22" '+R+'/>'
+    /* shorts */
+    +'<line x1="156" y1="56" x2="174" y2="55" stroke="'+so+'" stroke-width="26" '+R+'/>'
+    /* legs */
+    +'<line x1="174" y1="56" x2="194" y2="74" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="194" y1="74" x2="202" y2="88" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="206" cy="93" rx="13" ry="5" fill="'+fl+'"/>'
+    /* core dashed line */
+    +'<line x1="60" y1="63" x2="153" y2="58" stroke="'+color+'" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.42"/>'
+    +H(32,42)
+    +'</g></svg>';
+
+  /* ═══ 3: BICYCLE CRUNCHES — on back, torso twists + legs bike ═══ */
+  svgs[3]='<svg viewBox="0 0 190 132" width="190" height="132" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>'
+    +'.c1{transform-box:fill-box;transform-origin:0% 0%;animation:c1a 1s ease-in-out infinite}@keyframes c1a{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(22deg)}}'
+    +'.c2{transform-box:fill-box;transform-origin:0% 0%;animation:c2a 1s ease-in-out infinite}@keyframes c2a{0%,100%{transform:rotate(10deg)}50%{transform:rotate(58deg)}}'
+    +'.c3{transform-box:fill-box;transform-origin:0% 0%;animation:c3a 1s ease-in-out infinite .5s}@keyframes c3a{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(-58deg)}}'
+    +'</style>'
+    +'<line x1="8" y1="122" x2="182" y2="122" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* hips/shorts on ground */
+    +'<ellipse cx="80" cy="92" rx="18" ry="10" fill="'+so+'"/>'
+    /* left leg — pivot at hip */
+    +'<g transform="translate(80,92)"><g class="c2">'
+    +'<line x1="0" y1="0" x2="-20" y2="14" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="-20" y1="14" x2="-34" y2="26" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="-39" cy="30" rx="12" ry="5" fill="'+fl+'"/>'
+    +'</g></g>'
+    /* right leg — pivot at hip */
+    +'<g transform="translate(80,92)"><g class="c3">'
+    +'<line x1="0" y1="0" x2="20" y2="14" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="20" y1="14" x2="34" y2="26" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="39" cy="30" rx="12" ry="5" fill="'+fl+'"/>'
+    +'</g></g>'
+    /* rotating upper body — pivot at lower spine */
+    +'<g transform="translate(80,88)"><g class="c1">'
+    +'<line x1="0" y1="0" x2="48" y2="-24" stroke="'+sh+'" stroke-width="22" '+R+'/>'
+    /* left arm (near side, reaching to opposite knee) */
+    +'<line x1="44" y1="-24" x2="62" y2="-13" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    /* right arm (far side, behind head - faded) */
+    +'<line x1="6" y1="-5" x2="-12" y2="3" stroke="'+sk+'" stroke-width="9" '+R+' opacity="0.42"/>'
+    +H(62,-38)+'</g></g>'
+    +'</svg>';
+
+  /* ═══ 4: LEG RAISES — on back, legs lift ═══ */
+  svgs[4]='<svg viewBox="0 0 220 112" width="220" height="112" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>.d{transform-box:fill-box;transform-origin:100% 0%;animation:da 1.6s ease-in-out infinite}@keyframes da{0%,100%{transform:rotate(0deg)}44%,56%{transform:rotate(-88deg)}}</style>'
+    +'<line x1="8" y1="102" x2="212" y2="102" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* torso flat — head on right */
+    +'<line x1="70" y1="74" x2="180" y2="68" stroke="'+sh+'" stroke-width="22" '+R+'/>'
+    /* shorts */
+    +'<line x1="70" y1="74" x2="90" y2="74" stroke="'+so+'" stroke-width="26" '+R+'/>'
+    /* arms flat by sides */
+    +'<line x1="150" y1="70" x2="157" y2="86" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    +'<line x1="120" y1="72" x2="112" y2="88" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    /* legs pivot at hip (80,74) — both legs together */
+    +'<g transform="translate(80,74)"><g class="d">'
+    +'<line x1="0" y1="0" x2="-28" y2="10" stroke="'+so+'" stroke-width="14" '+R+'/>'
+    +'<line x1="-28" y1="10" x2="-52" y2="18" stroke="'+sk+'" stroke-width="12" '+R+'/>'
+    +'<ellipse cx="-59" cy="21" rx="14" ry="5.5" fill="'+fl+'"/>'
+    /* second leg, offset */
+    +'<line x1="0" y1="0" x2="-26" y2="4" stroke="'+so+'" stroke-width="11" '+R+' opacity="0.52"/>'
+    +'<line x1="-26" y1="4" x2="-49" y2="11" stroke="'+sk+'" stroke-width="9" '+R+' opacity="0.52"/>'
+    +'<ellipse cx="-55" cy="14" rx="12" ry="4.5" fill="'+fl+'" opacity="0.55"/>'
+    +'</g></g>'
+    +H(192,58)
+    +'<text x="30" y="26" fill="'+color+'" font-size="19" opacity="0.52" text-anchor="middle" font-family="sans-serif">&#x2191;</text>'
+    +'<text x="14" y="40" fill="'+color+'" font-size="13" opacity="0.3" text-anchor="middle" font-family="sans-serif">&#x2191;</text>'
+    +'</svg>';
+
+  /* ═══ 5: HIGH KNEES — standing, knees pump ═══ */
+  svgs[5]='<svg viewBox="0 0 130 152" width="130" height="152" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>'
+    +'.f1{transform-box:fill-box;transform-origin:0% 0%;animation:f1a .65s ease-in-out infinite}@keyframes f1a{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-72deg)}}'
+    +'.f2{transform-box:fill-box;transform-origin:0% 0%;animation:f2a .65s ease-in-out infinite .325s}@keyframes f2a{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-72deg)}}'
+    +'.f3{transform-box:fill-box;transform-origin:0% 0%;animation:f3a .65s ease-in-out infinite .325s}@keyframes f3a{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(40deg)}}'
+    +'.f4{transform-box:fill-box;transform-origin:0% 0%;animation:f4a .65s ease-in-out infinite}@keyframes f4a{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-40deg)}}'
+    +'</style>'
+    +'<line x1="8" y1="141" x2="122" y2="141" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* teal shirt body */
+    +'<line x1="65" y1="50" x2="65" y2="88" stroke="'+sh+'" stroke-width="24" '+R+'/>'
+    /* shorts */
+    +'<line x1="65" y1="80" x2="65" y2="94" stroke="'+so+'" stroke-width="27" '+R+'/>'
+    /* left arm — pivot at left shoulder (54,56) */
+    +'<g transform="translate(54,56)"><g class="f3">'
+    +'<line x1="0" y1="0" x2="-11" y2="20" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<line x1="-11" y1="20" x2="-17" y2="11" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'</g></g>'
+    /* right arm — pivot at right shoulder (76,56) */
+    +'<g transform="translate(76,56)"><g class="f4">'
+    +'<line x1="0" y1="0" x2="11" y2="20" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<line x1="11" y1="20" x2="17" y2="11" stroke="'+sk+'" stroke-width="9" '+R+'/>'
+    +'</g></g>'
+    /* left leg — pivot at left hip (57,92) */
+    +'<g transform="translate(57,92)"><g class="f1">'
+    +'<line x1="0" y1="0" x2="-3" y2="26" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="-3" y1="26" x2="-2" y2="48" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="-1" cy="54" rx="13" ry="5.5" fill="'+fl+'"/>'
+    +'</g></g>'
+    /* right leg — pivot at right hip (73,92) */
+    +'<g transform="translate(73,92)"><g class="f2">'
+    +'<line x1="0" y1="0" x2="3" y2="26" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="3" y1="26" x2="2" y2="48" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="1" cy="54" rx="13" ry="5.5" fill="'+fl+'"/>'
+    +'</g></g>'
+    +H(65,25)
+    +'<circle cx="7" cy="76" r="3.5" fill="'+color+'" opacity="0.42"/>'
+    +'<circle cx="3" cy="88" r="2.5" fill="'+color+'" opacity="0.26"/>'
+    +'</svg>';
+
+  /* ═══ 6: DEAD BUG — on back, opposite arm+leg lower ═══ */
+  svgs[6]='<svg viewBox="0 0 220 112" width="220" height="112" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>'
+    +'.g1{transform-box:fill-box;transform-origin:100% 100%;animation:g1a 1.9s ease-in-out infinite}@keyframes g1a{0%,100%{transform:rotate(0deg)}40%,60%{transform:rotate(65deg)}}'
+    +'.g2{transform-box:fill-box;transform-origin:100% 100%;animation:g2a 1.9s ease-in-out infinite}@keyframes g2a{0%,100%{transform:rotate(0deg)}40%,60%{transform:rotate(-65deg)}}'
+    +'</style>'
+    +'<line x1="8" y1="102" x2="212" y2="102" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* torso flat (teal) — head on right */
+    +'<line x1="70" y1="73" x2="172" y2="67" stroke="'+sh+'" stroke-width="22" '+R+'/>'
+    /* shorts at hips */
+    +'<line x1="70" y1="73" x2="92" y2="73" stroke="'+so+'" stroke-width="26" '+R+'/>'
+    /* static left arm (faded) pointing up */
+    +'<line x1="150" y1="68" x2="142" y2="50" stroke="'+sk+'" stroke-width="10" '+R+' opacity="0.3"/>'
+    +'<line x1="142" y1="50" x2="135" y2="34" stroke="'+sk+'" stroke-width="8" '+R+' opacity="0.3"/>'
+    +'<circle cx="134" cy="30" r="6" fill="'+sk+'" opacity="0.25"/>'
+    /* animated RIGHT arm — pivot at shoulder (172,66), arm points UP */
+    +'<g transform="translate(172,66)"><g class="g1">'
+    +'<line x1="0" y1="0" x2="-10" y2="-24" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    +'<line x1="-10" y1="-24" x2="-16" y2="-42" stroke="'+sk+'" stroke-width="8" '+R+'/>'
+    +'<circle cx="-16" cy="-46" r="6" fill="'+sk+'"/>'
+    +'</g></g>'
+    /* static right leg (faded) pointing up */
+    +'<line x1="80" y1="74" x2="64" y2="56" stroke="'+so+'" stroke-width="12" '+R+' opacity="0.3"/>'
+    +'<line x1="64" y1="56" x2="52" y2="42" stroke="'+sk+'" stroke-width="10" '+R+' opacity="0.3"/>'
+    +'<ellipse cx="47" cy="38" rx="11" ry="4.5" fill="'+fl+'" opacity="0.25"/>'
+    /* animated LEFT leg — pivot at hip (70,73), leg points UP */
+    +'<g transform="translate(70,73)"><g class="g2">'
+    +'<line x1="0" y1="0" x2="-14" y2="-20" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="-14" y1="-20" x2="-22" y2="-37" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="-26" cy="-42" rx="12" ry="5" fill="'+fl+'"/>'
+    +'</g></g>'
+    +H(188,56)
+    +'</svg>';
+
+  /* ═══ 7: RUSSIAN TWISTS — seated V, torso rotates ═══ */
+  svgs[7]='<svg viewBox="0 0 180 140" width="180" height="140" xmlns="http://www.w3.org/2000/svg">'
+    +'<style>.h{transform-box:fill-box;transform-origin:50% 100%;animation:ha 1.1s ease-in-out infinite}@keyframes ha{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(22deg)}}</style>'
+    +'<line x1="8" y1="130" x2="172" y2="130" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>'
+    /* left leg */
+    +'<line x1="88" y1="100" x2="50" y2="120" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="50" y1="120" x2="28" y2="126" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="20" cy="128" rx="13" ry="5" fill="'+fl+'"/>'
+    /* right leg */
+    +'<line x1="88" y1="100" x2="126" y2="120" stroke="'+so+'" stroke-width="13" '+R+'/>'
+    +'<line x1="126" y1="120" x2="148" y2="126" stroke="'+sk+'" stroke-width="11" '+R+'/>'
+    +'<ellipse cx="156" cy="128" rx="13" ry="5" fill="'+fl+'"/>'
+    /* hip */
+    +'<ellipse cx="88" cy="102" rx="18" ry="10" fill="'+so+'"/>'
+    /* rotating upper body — pivot at seat (88,98) */
+    +'<g transform="translate(88,98)"><g class="h">'
+    +'<line x1="0" y1="0" x2="0" y2="-46" stroke="'+sh+'" stroke-width="22" '+R+'/>'
+    /* arms holding weight */
+    +'<line x1="-8" y1="-28" x2="-26" y2="-18" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    +'<line x1="8" y1="-28" x2="26" y2="-18" stroke="'+sk+'" stroke-width="10" '+R+'/>'
+    /* weight ball */
+    +'<ellipse cx="0" cy="-19" rx="14" ry="8" fill="'+so+'"/>'
+    +'<ellipse cx="0" cy="-19" rx="9" ry="5" fill="'+color+'" opacity="0.72"/>'
+    +H(0,-60)+'</g></g>'
+    +'<path d="M36 82 Q88 64 140 82" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.28"/>'
+    +'</svg>';
+
+  return svgs[id]||'';
+}
+function weekDotsHTML(sessions,color){
+  var labels=['L','M','M','G','V','S','D'];
+  return '<div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;">'+
+    labels.map(function(d,i){
+      var done=i<sessions;
+      return '<div class="week-dot" style="background:'+(done?color:'rgba(255,255,255,.06)')
+        +';border-color:'+(done?color:'rgba(255,255,255,.1)')
+        +';color:'+(done?'#000':'rgba(255,255,255,.3)')
+        +';box-shadow:'+(done?'0 0 9px '+color+'60':'none')+';">'+(done?'&#x2713;':d)+'</div>';
+    }).join('')+'</div>';
+}
+function renderHome(){
+  var g=goalOf(state.currentWeek);
+  var badgeDone=hasBadge(state.currentWeek);
+  /* FIX #1 — usa ISO per coerenza con state.todayDate e state.lastDone */
+  var today=todayStr();
+  var sess=Math.min(state.weekSessions,g.target);
+  var pct=(sess/g.target)*100;
+  document.getElementById('stat-sessions').textContent=state.totalSessions;
+  document.getElementById('stat-streak').textContent=state.streak+'\uD83D\uDD25';
+  document.getElementById('stat-badges').textContent=state.earnedBadges.length+'\uD83C\uDFC5';
+  /* Today counter card — only show if at least 1 session done today */
+  var todayActive=state.todayDate===today&&state.todayCount>0;
+  document.getElementById('stat-today-card').style.display=todayActive?'':'none';
+  if(todayActive) document.getElementById('stat-today').textContent=state.todayCount;
+  /* Done-today message with repeat count */
+  var dtMsg=document.getElementById('done-today-msg');
+  if(todayActive){
+    dtMsg.style.display='block';
+    dtMsg.innerHTML=state.todayCount===1
+      ?'&#x2705; Routine completata oggi!'
+      :'&#x1F501; Hai completato la routine <strong>'+state.todayCount+'&nbsp;volte</strong> oggi! Bestia! \uD83D\uDCAA';
+  } else {
+    dtMsg.style.display='none';
+  }
+  document.getElementById('start-btn').textContent=todayActive?'Ripeti ancora ('+state.todayCount+'x)':'Inizia ora';
+  document.getElementById('bg-glow').style.background='radial-gradient(circle,'+g.color+'0E 0%,transparent 70%)';
+  document.getElementById('goal-banner').style.cssText='background:'+g.color+'0E;border:1px solid '+g.color+'40;';
+  document.getElementById('goal-banner').innerHTML=
+    '<div style="position:absolute;top:0;right:0;padding:5px 13px;background:'+g.color+'22;border-bottom-left-radius:12px;font-size:.58rem;letter-spacing:2px;color:'+g.color+';font-weight:700;">SETTIMANA '+state.currentWeek+' \u2192</div>'+
+    '<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;"><span style="font-size:1.7rem;">'+g.icon+'</span><div>'+
+    '<div style="font-size:.58rem;letter-spacing:2px;color:'+g.color+';font-weight:700;margin-bottom:2px;">OBIETTIVO SETTIMANALE</div>'+
+    '<div style="font-size:1rem;font-weight:800;">'+g.title+'</div></div>'+(badgeDone?'<div style="margin-left:auto;font-size:1.3rem;">\uD83C\uDFC5</div>':'')+'</div>'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:.62rem;color:rgba(255,255,255,.33);letter-spacing:1px;">PROGRESSO</span><span style="font-size:.75rem;color:'+g.color+';font-weight:700;">'+sess+' / '+g.target+' sessioni</span></div>'+
+    '<div class="prog-bar-bg" style="margin-bottom:9px;"><div class="prog-bar" style="background:'+g.color+';box-shadow:0 0 8px '+g.color+'80;width:'+pct+'%;"></div></div>'+
+    weekDotsHTML(Math.min(state.weekSessions,7),g.color)+
+    (badgeDone?'<div class="shimmer" style="margin-top:9px;font-size:.7rem;color:'+g.color+';font-weight:700;letter-spacing:1px;text-align:center;">\uD83C\uDFC5 '+g.reward+' sbloccato!</div>':'');
+  /* FIX #5 — banner progressione */
+  var wpEl=document.getElementById('week-prog-info');
+  if(wpEl){
+    if(state.currentWeek>1){
+      var inc=Math.round((state.currentWeek-1)*5);
+      wpEl.innerHTML='<div style="background:rgba(255,140,0,.08);border:1px solid rgba(255,140,0,.2);border-radius:10px;padding:8px 14px;font-size:.72rem;font-family:var(--body);color:rgba(255,140,0,.7);margin-bottom:14px;">&#x1F4C8; Settimana '+state.currentWeek+': durata esercizi +'+inc+'% vs settimana 1</div>';
+    } else { wpEl.innerHTML=''; }
+  }
+  /* FIX #6 — heatmap */
+  var hmEl=document.getElementById('heatmap-wrap');
+  if(hmEl)hmEl.innerHTML=renderHeatmap();
+  document.getElementById('exercise-list').innerHTML=EXERCISES.map(function(ex,i){
+    var isOpen=wk.openPreview===i;
+    var dur=scaledDuration(ex);
+    return '<div class="ex-card" id="excard-'+i+'" onclick="togglePreview('+i+')" style="'+(isOpen?'border-color:'+ex.color+'55;background:'+ex.color+'0C;':'')+'">'
+      +'<div style="display:flex;align-items:center;gap:10px;">'
+      +'<div style="width:32px;height:32px;border-radius:50%;background:'+ex.color+'20;border:1px solid '+ex.color+'45;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;">'+ex.emoji+'</div>'
+      +'<div style="flex:1;"><div style="font-weight:700;font-size:.95rem;">'+ex.name+'</div><div style="font-size:.62rem;color:rgba(255,255,255,.32);margin-top:1px;">'+ex.target+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:.85rem;color:'+ex.color+';font-weight:700;">'+dur+'s</span><span style="font-size:.58rem;color:rgba(255,255,255,.2);">'+(isOpen?'&#x25B2;':'&#x25BC;')+'</span></div>'
+      +'</div>'
+      +(isOpen?'<div style="margin-top:12px;padding-top:12px;border-top:1px solid '+ex.color+'22;display:flex;align-items:center;gap:12px;">'
+        +'<div style="background:'+ex.color+'0F;border:1px solid '+ex.color+'28;border-radius:13px;padding:9px 10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+svgFor(ex.id,ex.color)+'</div>'
+        +'<div style="flex:1;"><p style="color:rgba(255,255,255,.55);font-family:var(--body);font-size:.82rem;line-height:1.65;">'+ex.desc+'</p>'
+        +'<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">'
+        +'<span style="background:'+ex.color+'22;border:1px solid '+ex.color+'44;border-radius:20px;padding:3px 10px;font-size:.63rem;color:'+ex.color+';font-weight:600;">\u23F1 '+dur+'s</span>'
+        +'<span style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 9px;font-size:.63rem;color:rgba(255,255,255,.36);">\uD83D\uDE2E\u200D\uD83D\uDCA8 '+ex.rest+'s riposo</span>'
+        +'</div></div></div>':'')
+      +'</div>';
+  }).join('');
+}
+function togglePreview(i){wk.openPreview=wk.openPreview===i?-1:i;renderHome();}
+
+/* FIX #6 — HEATMAP */
+function renderHeatmap(){
+  var now=new Date();now.setHours(0,0,0,0);
+  var h='<div style="font-size:.6rem;letter-spacing:3px;color:rgba(255,255,255,.24);margin-bottom:8px;text-transform:uppercase;">&#x1F4C5; Storico 4 settimane</div><div class="hmap">';
+  for(var i=27;i>=0;i--){
+    var d=new Date(now);d.setDate(now.getDate()-i);
+    var iso=d.toISOString().split('T')[0];
+    var cnt=0;
+    for(var j=0;j<state.sessionDates.length;j++){if(state.sessionDates[j]===iso)cnt++;}
+    var isT=(i===0);
+    var bg=cnt===0?(isT?'rgba(255,255,255,.11)':'rgba(255,255,255,.05)'):cnt===1?'rgba(255,77,77,.55)':'#FF4D4D';
+    h+='<div class="hcell" style="background:'+bg+';'+(isT?'box-shadow:0 0 0 1px rgba(255,255,255,.22);':'')+'" title="'+iso+(cnt?' \xb7 '+cnt+(cnt===1?' sessione':' sessioni'):'')+'"></div>';
+  }
+  h+='</div><div style="display:flex;justify-content:flex-end;align-items:center;gap:5px;margin-top:4px;">'
+    +'<span style="font-size:.55rem;color:rgba(255,255,255,.2);">0</span>'
+    +'<div style="width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,.05);"></div>'
+    +'<div style="width:10px;height:10px;border-radius:3px;background:rgba(255,77,77,.55);"></div>'
+    +'<div style="width:10px;height:10px;border-radius:3px;background:#FF4D4D;"></div>'
+    +'<span style="font-size:.55rem;color:rgba(255,255,255,.2);">2+</span></div>';
+  return h;
+}
+
+/* FIX — SPOTIFY */
+var SPOTIFY_PL=[
+  {name:'Beast Mode',desc:'Hip-hop ad alta energia',url:'https://open.spotify.com/playlist/4rzfv0JLZfVhOhbSQ8o5jZ',bpm:'130-160 BPM',e:'\uD83D\uDD25'},
+  {name:'Workout Motivation',desc:'Rock e elettronica',url:'https://open.spotify.com/playlist/37i9dQZF1DX70RN3TfWWJh',bpm:'125-155 BPM',e:'\uD83D\uDCAA'},
+  {name:'Power Hour',desc:'EDM e house per HIIT',url:'https://open.spotify.com/playlist/37i9dQZF1DXdxcBWuJkbcy',bpm:'128-145 BPM',e:'\u26A1'},
+  {name:'Running & Cardio',desc:'Tracce ritmate',url:'https://open.spotify.com/playlist/37i9dQZF1DX2o1jzazbose',bpm:'140-170 BPM',e:'\uD83C\uDFC3'},
+  {name:'Chill Workout',desc:'Lo-fi per ritmi rilassati',url:'https://open.spotify.com/playlist/37i9dQZF1DX3rxVfibe1L0',bpm:'90-110 BPM',e:'\uD83D\uDE0C'}
+];
+function openSpotify(){
+  var panel=document.getElementById('spotify-panel');
+  if(panel.style.display==='block'){panel.style.display='none';return;}
+  document.getElementById('spotify-list').innerHTML=SPOTIFY_PL.map(function(p){
+    return '<a href="'+p.url+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;text-decoration:none;color:white;">'
+      +'<span style="font-size:1.5rem;flex-shrink:0;">'+p.e+'</span>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:700;">'+p.name+'</div>'
+      +'<div style="font-size:.68rem;color:rgba(255,255,255,.4);font-family:var(--body);margin-top:1px;">'+p.desc+'</div></div>'
+      +'<div style="text-align:right;flex-shrink:0;"><div style="font-size:.65rem;color:#1DB954;font-weight:700;">'+p.bpm+'</div>'
+      +'<svg width="18" height="18" viewBox="0 0 24 24" fill="#1DB954" style="margin-top:3px;opacity:.7"><path d="M8 5v14l11-7z"/></svg></div></a>';
+  }).join('');
+  panel.style.display='block';
+  setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+}
+
+/* FIX #7 — RESET */
+function resetProgram(){
+  if(!confirm('Sei sicuro? Perderai streak, badge e tutto il progresso.'))return;
+  localStorage.removeItem('bb_state');
+  showToast('\uD83D\uDD04 Programma reimpostato');
+  setTimeout(function(){location.reload();},1000);
+}
+
+/* FIX #8 — BACKUP */
+function exportState(){
+  try{
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='belly-burn-'+todayStr()+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showToast('\uD83D\uDCBE Backup esportato!');
+  }catch(e){showToast('\u274C Errore esportazione','var(--red)');}
+}
+function importState(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=function(ev){
+    var file=ev.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var imp=JSON.parse(e.target.result);
+        if(imp.streak===undefined)throw new Error();
+        Object.assign(state,imp);saveState();
+        document.getElementById('settings-overlay').classList.remove('open');
+        document.body.style.overflow='';
+        renderHome();showToast('\u2705 Backup ripristinato!');
+      }catch(err){showToast('\u274C File non valido','var(--red)');}
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+/* FIX #7/#8/#9 — SETTINGS */
+function openSettings(){
+  var sel=document.getElementById('notif-sel');
+  if(sel&&state.notifHour>=0)sel.value=state.notifHour;
+  updateNotifStatus();
+  document.getElementById('settings-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(e){
+  if(e.target!==document.getElementById('settings-overlay'))return;
+  document.getElementById('settings-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* FIX #9 — NOTIFICHE */
+var _nTimer=null;
+function setNotifHour(h){state.notifHour=parseInt(h);saveState();scheduleNotif();updateNotifStatus();}
+function updateNotifStatus(){
+  var el=document.getElementById('notif-status');if(!el)return;
+  if(!('Notification' in window)){el.textContent='\u26A0\uFE0F Non supportato in questo browser';return;}
+  if(Notification.permission==='denied'){el.textContent='\uD83D\uDEAB Bloccate \u2014 abilitale nelle impostazioni';return;}
+  if(state.notifHour<0){el.textContent='Promemoria disattivato';return;}
+  if(Notification.permission==='default'){el.textContent='\uD83D\uDD14 Premi Attiva per abilitare';return;}
+  el.textContent='\u2705 Promemoria attivo alle '+String(state.notifHour).padStart(2,'0')+':00';
+}
+function requestNotif(){
+  if(!('Notification' in window)){showToast('\u26A0\uFE0F Non supportato','var(--yellow)');return;}
+  Notification.requestPermission().then(function(p){
+    updateNotifStatus();
+    if(p==='granted'){
+      showToast('\u2705 Notifiche attivate!');
+      if(state.notifHour<0){var sel=document.getElementById('notif-sel');if(sel){sel.value=8;setNotifHour(8);}}
+      scheduleNotif();
+    } else {showToast('\u26A0\uFE0F Permesso negato','var(--yellow)');}
+  });
+}
+function scheduleNotif(){
+  if(_nTimer)clearTimeout(_nTimer);
+  if(!('Notification' in window)||Notification.permission!=='granted'||state.notifHour<0)return;
+  var now=new Date(),target=new Date();
+  target.setHours(state.notifHour,0,0,0);
+  if(target<=now)target.setDate(target.getDate()+1);
+  _nTimer=setTimeout(function(){
+    if(state.lastDone!==todayStr()){
+      try{new Notification('\uD83D\uDD25 Belly Burn',{body:'Mancano solo 7 minuti. \u00C8 ora del tuo allenamento!'});}catch(e){}
+    }
+    scheduleNotif();
+  },target-now);
+}
+
+function renderGoals(){
+  var g=goalOf(state.currentWeek);
+  var sess=Math.min(state.weekSessions,g.target);
+  var pct=(sess/g.target)*100;
+  var done=hasBadge(state.currentWeek);
+  /* Compute real date range and days left for current week */
+  var dateRangeStr='',daysLeftStr='';
+  if(state.appStartDate){
+    var wkStart=new Date(state.appStartDate);
+    wkStart.setDate(wkStart.getDate()+(state.currentWeek-1)*7);
+    var wkEnd=new Date(wkStart);wkEnd.setDate(wkEnd.getDate()+6);
+    var fmt2=function(d){return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();};
+    dateRangeStr=fmt2(wkStart)+' \u2013 '+fmt2(wkEnd);
+    var now2=new Date();now2.setHours(0,0,0,0);
+    var dLeft=Math.max(0,Math.ceil((wkEnd-now2)/(1000*60*60*24)));
+    daysLeftStr=dLeft===0?'Ultimo giorno!':dLeft===1?'1 giorno rimasto':dLeft+' giorni rimasti';
+  }
+  document.getElementById('goals-current-week').style.cssText='background:'+g.color+'12;border:1px solid '+g.color+'40;';
+  document.getElementById('goals-current-week').innerHTML=
+    '<div style="position:absolute;top:0;right:0;padding:5px 12px;background:'+g.color+'25;border-bottom-left-radius:12px;font-size:.6rem;letter-spacing:2px;color:'+g.color+';font-weight:700;">SETTIMANA '+state.currentWeek+'</div>'+
+    '<div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;"><span style="font-size:2rem;line-height:1;">'+g.icon+'</span><div>'+
+    '<div style="font-size:1.2rem;font-weight:900;letter-spacing:.3px;">'+g.title+'</div>'+
+    '<div style="color:rgba(255,255,255,.42);font-family:var(--body);font-size:.82rem;line-height:1.55;margin-top:3px;">'+g.desc+'</div>'+
+    (dateRangeStr?'<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+      +'<span style="font-size:.65rem;color:rgba(255,255,255,.38);font-family:var(--body);">&#x1F4C5; '+dateRangeStr+'</span>'
+      +(daysLeftStr?'<span style="font-size:.62rem;color:'+g.color+';font-weight:700;background:'+g.color+'20;border-radius:10px;padding:2px 8px;">'+daysLeftStr+'</span>':'')
+      +'</div>':'')
+    +'</div></div>'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:.65rem;color:rgba(255,255,255,.35);letter-spacing:1px;">PROGRESSO</span><span style="font-size:.78rem;color:'+g.color+';font-weight:700;">'+sess+' / '+g.target+' sessioni</span></div>'+
+    '<div class="prog-bar-bg" style="margin-bottom:9px;"><div class="prog-bar" style="background:'+g.color+';box-shadow:0 0 8px '+g.color+'80;width:'+pct+'%;"></div></div>'+
+    weekDotsHTML(Math.min(state.weekSessions,7),g.color)+
+    (done?'<div style="margin-top:11px;text-align:center;font-size:.73rem;color:'+g.color+';font-weight:700;letter-spacing:1px;">\uD83C\uDFC5 '+g.reward+' &mdash; SBLOCCATO!</div>':'');
+  document.getElementById('goals-timeline').innerHTML=WEEKLY_GOALS.map(function(g2){
+    var wk2=g2.week,isCurrent=wk2===state.currentWeek,isPast=wk2<state.currentWeek,isFuture=wk2>state.currentWeek,badge=hasBadge(wk2);
+    var dateLabel='';
+    if(state.appStartDate){
+      var ws=new Date(state.appStartDate);ws.setDate(ws.getDate()+(wk2-1)*7);
+      var we=new Date(ws);we.setDate(we.getDate()+6);
+      var fmt=function(d){return d.getDate()+'/'+(d.getMonth()+1);};
+      dateLabel=fmt(ws)+' \u2013 '+fmt(we);
+    }
+    return '<div style="background:'+(isCurrent?g2.color+'0E':'rgba(255,255,255,.03)')
+      +';border:1px solid '+(isCurrent?g2.color+'40':badge?g2.color+'25':'rgba(255,255,255,.06)')
+      +';border-radius:14px;padding:12px 15px;margin-bottom:8px;opacity:'+(isFuture?.45:1)+';">'
+      +'<div style="display:flex;align-items:center;gap:11px;">'
+      +'<div style="width:35px;height:35px;border-radius:50%;flex-shrink:0;background:'+(badge?g2.color+'30':isCurrent?g2.color+'18':'rgba(255,255,255,.05)')
+      +';border:1px solid '+(badge?g2.color+'60':'rgba(255,255,255,.08)')
+      +';display:flex;align-items:center;justify-content:center;font-size:1.05rem;">'+(badge?'\uD83C\uDFC5':isFuture?'\uD83D\uDD12':g2.icon)+'</div>'
+      +'<div style="flex:1;">'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+      +'<span style="font-size:.65rem;letter-spacing:2px;color:'+(isCurrent?g2.color:'rgba(255,255,255,.25)')+';font-weight:700;">SETTIMANA '+wk2+'</span>'
+      +(dateLabel?'<span style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:var(--body);">'+dateLabel+'</span>':'')
+      +(isCurrent?'<span style="background:'+g2.color+'25;color:'+g2.color+';font-size:.52rem;padding:2px 7px;border-radius:10px;font-weight:700;letter-spacing:1px;">IN CORSO</span>':'')
+      +'</div>'
+      +'<div style="font-size:.9rem;font-weight:700;margin-top:1px;">'+g2.title+'</div>'
+      +(!isFuture?'<div style="font-size:.67rem;color:rgba(255,255,255,.33);margin-top:1px;">'+g2.reward+'</div>':'')+'</div>'
+      +'<div style="text-align:right;font-size:.72rem;font-weight:700;">'
+      +(badge?'<span style="color:'+g2.color+';">\u2713 Fatto</span>':isCurrent?'<span style="color:'+g2.color+';">'+Math.min(state.weekSessions,g2.target)+'/'+g2.target+'</span>':isPast?'<span style="color:rgba(255,255,255,.25);">Scaduto</span>':'<span style="color:rgba(255,255,255,.2);">'+g2.target+' sess.</span>')+'</div>'
+      +'</div></div>';
+  }).join('');
+}
+function renderComplete(badgeUnlocked){
+  var g=goalOf(state.currentWeek);
+  document.getElementById('c-streak').textContent=state.streak+'\uD83D\uDD25';
+  document.getElementById('c-goal').textContent=Math.min(state.weekSessions,g.target)+'/'+g.target;
+  document.getElementById('c-goal-card').style.cssText='flex:1;background:'+g.color+'0E;border:1px solid '+g.color+'35;border-radius:16px;padding:13px 8px;text-align:center;';
+  document.getElementById('c-goal').style.color=g.color;
+  document.getElementById('c-today').textContent=state.todayCount+'\uD83D\uDD01';
+  document.getElementById('c-badges').textContent=state.earnedBadges.length+'\uD83C\uDFC5';
+  var kcalEl=document.getElementById('c-kcal');
+  if(kcalEl)kcalEl.textContent='~'+calcCalories();
+  if(badgeUnlocked){
+    document.getElementById('complete-icon').textContent=g.icon;
+    document.getElementById('complete-title').innerHTML='BADGE<br>SBLOCCATO!';
+    var b=document.getElementById('badge-unlock-banner');
+    b.style.cssText='display:block;background:'+g.color+'18;border:2px solid '+g.color+'60;border-radius:18px;padding:18px;margin-bottom:16px;';
+    document.getElementById('badge-name').textContent=g.reward;
+    document.getElementById('badge-name').style.color=g.color;
+    document.getElementById('badge-week').textContent=g.title+' \u2014 Settimana '+state.currentWeek;
+  } else {
+    document.getElementById('complete-icon').textContent='\uD83C\uDFC6';
+    document.getElementById('complete-title').innerHTML='OTTIMO<br>LAVORO!';
+    document.getElementById('badge-unlock-banner').style.display='none';
+  }
+  var sess=Math.min(state.weekSessions,g.target),pct=(sess/g.target)*100;
+  document.getElementById('complete-week-card').innerHTML=
+    '<div style="display:flex;justify-content:space-between;margin-bottom:7px;"><span style="font-size:.66rem;letter-spacing:2px;color:'+g.color+';font-weight:700;">SETTIMANA '+state.currentWeek+'</span><span style="font-size:.66rem;color:rgba(255,255,255,.33);">'+g.title+'</span></div>'+
+    '<div class="prog-bar-bg" style="margin-bottom:9px;"><div class="prog-bar" style="background:'+g.color+';box-shadow:0 0 8px '+g.color+'80;width:'+pct+'%;"></div></div>'+
+    weekDotsHTML(Math.min(state.weekSessions,7),g.color);
+}
+/* ── AUDIO ENGINE (Web Audio API, no files needed) ── */
+var audioCtx=null;
+var isMuted=false;
+function toggleMute(){
+  isMuted=!isMuted;
+  state.isMuted=isMuted; /* FIX #4 — persiste la preferenza */
+  saveState();
+  var btn=document.getElementById('mute-btn');
+  if(btn)btn.textContent=isMuted?'\uD83D\uDD07':'\uD83D\uDD0A';
+}
+function getCtx(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq,dur,type,vol,delay){
+  if(isMuted)return;
+  try{
+    var ctx=getCtx();var t=ctx.currentTime+(delay||0);
+    var osc=ctx.createOscillator();var gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.type=type||'sine';osc.frequency.setValueAtTime(freq,t);
+    gain.gain.setValueAtTime(vol||0.4,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    osc.start(t);osc.stop(t+dur+0.05);
+  }catch(e){}
+}
+function vibratePhone(pattern){
+  try{if(navigator.vibrate)navigator.vibrate(pattern);}catch(e){}
+}
+/* 3-2-1 countdown beeps (short high pip) */
+function playCountdownBeep(){
+  playTone(880,0.08,'square',0.3);
+  vibratePhone(40);
+}
+/* Exercise finished → short double beep + buzz */
+function playExerciseDone(){
+  playTone(660,0.12,'sine',0.5,0);
+  playTone(880,0.18,'sine',0.5,0.15);
+  vibratePhone([60,40,60]);
+}
+/* Rest finished → go! ascending fanfare + long buzz */
+function playRestDone(){
+  playTone(523,0.1,'sine',0.45,0);
+  playTone(659,0.1,'sine',0.45,0.1);
+  playTone(784,0.2,'sine',0.5,0.2);
+  vibratePhone([80,30,80,30,200]);
+}
+/* Workout complete → victory fanfare */
+function playWorkoutComplete(){
+  playTone(523,0.15,'sine',0.5,0);
+  playTone(659,0.15,'sine',0.5,0.15);
+  playTone(784,0.15,'sine',0.5,0.30);
+  playTone(1047,0.4,'sine',0.55,0.45);
+  vibratePhone([100,50,100,50,100,50,400]);
+}
+/* Unlock AudioContext on first user interaction */
+document.addEventListener('touchstart',function(){getCtx();},{once:true,passive:true});
+document.addEventListener('click',function(){getCtx();},{once:true});
+
+function startWorkout(){
+  wk.exIdx=0;wk.totalElapsed=0;wk.isRest=false;wk.isPaused=false;
+  wk.phase='warmup';wk.timeLeft=WARMUP[0].duration;
+  acquireWakeLock();noSleepStart();
+  updateWorkoutUI();showScreen('workout');startTimer();
+}
+function startTimer(){
+  stopTimer();
+  wk.timerInterval=setInterval(function(){
+    if(wk.isPaused)return;
+    wk.timeLeft--;wk.totalElapsed++;
+    if(wk.timeLeft<=0){advance();}
+    else{
+      /* countdown beep at 3-2-1 seconds */
+      if(wk.timeLeft<=3)playCountdownBeep();
+      updateWorkoutUI();
+    }
+  },1000);
+}
+function stopTimer(){clearInterval(wk.timerInterval);wk.timerInterval=null;releaseWakeLock();noSleepStop();}
+function advance(){
+  if(wk.phase==='warmup'){
+    var nw=wk.exIdx+1;
+    if(nw<WARMUP.length){playExerciseDone();wk.exIdx=nw;wk.timeLeft=WARMUP[nw].duration;updateWorkoutUI();}
+    else{playRestDone();wk.phase='main';wk.exIdx=0;wk.isRest=false;wk.timeLeft=scaledDuration(EXERCISES[0]);updateWorkoutUI();}
+    return;
+  }
+  if(wk.isRest){
+    var next=wk.exIdx+1;
+    if(next>=EXERCISES.length){sessionComplete();}
+    else{playRestDone();wk.exIdx=next;wk.isRest=false;wk.timeLeft=scaledDuration(EXERCISES[next]);updateWorkoutUI();}
+  } else {
+    playExerciseDone();wk.isRest=true;wk.timeLeft=EXERCISES[wk.exIdx].rest;updateWorkoutUI();
+  }
+}
+function skipExercise(){advance();}
+function skipRest(){if(wk.isRest)advance();}
+function togglePause(){
+  wk.isPaused=!wk.isPaused;
+  document.getElementById('pause-btn').textContent=wk.isPaused?'\u25B6 Riprendi':'\u23F8 Pausa';
+}
+function sessionComplete(){
+  stopTimer();
+  /* FIX #1 — formato ISO coerente con todayStr() */
+  var today=todayStr();
+  var yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  var newStreak=state.lastDone===yesterday?state.streak+1:state.lastDone===today?state.streak:1;
+  var newTotal=state.totalSessions+1;
+  var newWeekS=state.lastDone===today?state.weekSessions:state.weekSessions+1;
+  /* Daily repeat counter — resets each new day */
+  var newTodayCount=state.todayDate===today?state.todayCount+1:1;
+  state.streak=newStreak;state.lastDone=today;state.totalSessions=newTotal;state.weekSessions=newWeekS;
+  state.todayCount=newTodayCount;state.todayDate=today;
+  if(!state.sessionDates)state.sessionDates=[];
+  state.sessionDates.push(today);
+  if(state.sessionDates.length>180)state.sessionDates=state.sessionDates.slice(-180);
+  var g=goalOf(state.currentWeek);
+  var justUnlocked=newWeekS>=g.target&&!hasBadge(state.currentWeek);
+  if(justUnlocked)state.earnedBadges.push(state.currentWeek);
+  saveState();playWorkoutComplete();renderComplete(justUnlocked);showScreen('complete');
+}
+function updateWorkoutUI(){
+  var totalDur=calcTotalDuration();
+  var pct=Math.min(wk.totalElapsed/totalDur,1);
+  document.getElementById('session-bar').style.width=(pct*100)+'%';
+  document.getElementById('time-left-label').textContent='~'+Math.max(1,Math.ceil((totalDur-wk.totalElapsed)/60))+'min';
+  if(wk.phase==='warmup'){
+    var wu=WARMUP[wk.exIdx];
+    document.getElementById('wu-badge').style.display='inline-flex';
+    document.getElementById('rest-panel').style.display='none';
+    document.getElementById('active-panel').style.display='flex';
+    document.getElementById('ex-counter').textContent='RISCALDAMENTO '+(wk.exIdx+1)+'/'+WARMUP.length;
+    var wuMax=wu.duration,wuEl=wuMax-wk.timeLeft,wuProg=wuEl/wuMax;
+    var fill=document.getElementById('timer-fill');
+    fill.style.strokeDashoffset=CIRCUMFERENCE-(wuProg*CIRCUMFERENCE);fill.style.stroke=wu.color;
+    document.getElementById('timer-display').textContent=wk.timeLeft;
+    document.getElementById('bg-glow').style.background='radial-gradient(circle,'+wu.color+'10 0%,transparent 70%)';
+    var aw=document.getElementById('anim-window');
+    aw.style.background=wu.color+'0E';aw.style.border='1px solid '+wu.color+'28';aw.innerHTML=svgForWarmup(wu.id,wu.color);
+    document.getElementById('ex-target-label').textContent=wu.emoji+' '+wu.target.toUpperCase();
+    document.getElementById('ex-target-label').style.color=wu.color;
+    document.getElementById('ex-name-display').textContent=wu.name;
+    document.getElementById('ex-desc-display').textContent=wu.desc;
+    document.getElementById('progress-dots').innerHTML=WARMUP.map(function(e,i){
+      return '<div class="qdot" style="background:'+(i<wk.exIdx?'rgba(255,255,255,.09)':i===wk.exIdx?e.color:'rgba(255,255,255,.04)')+';border:'+(i===wk.exIdx?'2px solid '+e.color:'1px solid rgba(255,255,255,.07)')+';opacity:'+(i<wk.exIdx?.4:1)+';box-shadow:'+(i===wk.exIdx?'0 0 12px '+e.color+'70':'none')+';">'+(i<wk.exIdx?'&#x2713;':e.emoji)+'</div>';
+    }).join('');
+    return;
+  }
+  document.getElementById('wu-badge').style.display='none';
+  var ex=EXERCISES[wk.exIdx];
+  var dur=scaledDuration(ex);
+  document.getElementById('ex-counter').textContent=(wk.exIdx+1)+' / '+EXERCISES.length;
+  if(wk.isRest){
+    document.getElementById('rest-panel').style.display='flex';
+    document.getElementById('active-panel').style.display='none';
+    document.getElementById('rest-count').textContent=wk.timeLeft;
+    var ni=wk.exIdx+1,np=document.getElementById('next-ex-preview');
+    if(ni<EXERCISES.length){
+      var nx=EXERCISES[ni],nxD=scaledDuration(nx);
+      np.innerHTML='<div style="font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:1px;">PROSSIMO</div>'
+        +'<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:7px 14px;display:flex;align-items:center;gap:9px;">'
+        +'<div style="background:'+nx.color+'22;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.9rem;">'+nx.emoji+'</div>'
+        +'<span style="font-weight:700;font-size:.88rem;">'+nx.name+'</span>'
+        +'<span style="font-size:.76rem;color:'+nx.color+';">'+nxD+'s</span></div>';
+      var nd=document.getElementById('rest-next-desc');nd.style.display='block';nd.textContent=nx.desc;
+    } else {np.innerHTML='';document.getElementById('rest-next-desc').style.display='none';}
+  } else {
+    document.getElementById('rest-panel').style.display='none';
+    document.getElementById('active-panel').style.display='flex';
+    var timerMax=dur,elapsed2=timerMax-wk.timeLeft,progress=elapsed2/timerMax;
+    var offset=CIRCUMFERENCE-(progress*CIRCUMFERENCE);
+    var fill2=document.getElementById('timer-fill');
+    fill2.style.strokeDashoffset=offset;fill2.style.stroke=ex.color;
+    document.getElementById('timer-display').textContent=wk.timeLeft;
+    document.getElementById('bg-glow').style.background='radial-gradient(circle,'+ex.color+'10 0%,transparent 70%)';
+    var aw2=document.getElementById('anim-window');
+    aw2.style.background=ex.color+'0E';aw2.style.border='1px solid '+ex.color+'28';aw2.innerHTML=svgFor(ex.id,ex.color);
+    document.getElementById('ex-target-label').textContent=ex.emoji+' '+ex.target.toUpperCase();
+    document.getElementById('ex-target-label').style.color=ex.color;
+    document.getElementById('ex-name-display').textContent=ex.name;
+    document.getElementById('ex-desc-display').textContent=ex.desc;
+  }
+  document.getElementById('progress-dots').innerHTML=EXERCISES.map(function(e,i){
+    return '<div class="qdot" style="background:'+(i<wk.exIdx?'rgba(255,255,255,.09)':i===wk.exIdx?e.color:'rgba(255,255,255,.04)')+';border:'+(i===wk.exIdx?'2px solid '+e.color:'1px solid rgba(255,255,255,.07)')+';opacity:'+(i<wk.exIdx?.4:1)+';box-shadow:'+(i===wk.exIdx?'0 0 12px '+e.color+'70':'none')+';">'+(i<wk.exIdx?'&#x2713;':e.emoji)+'</div>';
+  }).join('');
+}
+/* ══════════════════════════════════════
+   SCREEN ALWAYS-ON  (Wake Lock API + NoSleep fallback)
+══════════════════════════════════════ */
+var wakeLock=null;
+var noSleepVid=null;
+
+/* Native Wake Lock API */
+async function acquireWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{
+    if(wakeLock&&wakeLock.released===false)return; // already held
+    wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',function(){wakeLock=null;});
+  }catch(e){}
+}
+async function releaseWakeLock(){
+  try{if(wakeLock)await wakeLock.release();}catch(e){}
+  wakeLock=null;
+}
+
+/* NoSleep fallback: tiny invisible looping video keeps screen on on older iOS/Android */
+function noSleepStart(){
+  if(noSleepVid)return;
+  noSleepVid=document.createElement('video');
+  noSleepVid.setAttribute('playsinline','');
+  noSleepVid.setAttribute('muted','');
+  noSleepVid.loop=true;
+  noSleepVid.style.cssText='position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:0;left:0;';
+  /* 1×1 transparent MP4 data URI (base64) */
+  var src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAA'
+    +'KhtZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE0OCByMjYwMSBhMGNkN'
+    +'2QzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNSAtIGh0dHA6'
+    +'Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVi'
+    +'bG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9'
+    +'MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4'
+    +'eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNl'
+    +'dD0tMiB0aHJlYWRzPTYgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAg'
+    +'ZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2lucmE9'
+    +'MCBiZnJhbWVzPTMgYl9weXJhbWlkPTIgYl9hZGFwdD0xIGJfYmlhcz0wIGRpcmVjdD0xIHdlaWdo'
+    +'dGI9MSBvcGVuX2dvcD0wIHdlaWdodHA9MiBrZXlpbnQ9MjUwIGtleWludF9taW49MjUgc2NlbmVj'
+    +'dXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3Jm'
+    +'PTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAg'
+    +'YXE9MTowLjYwAAAAAWWIhAAAf//+7u5zf09yn+C9PgL6AkvaAAIAAAMAEAAAAwAZYiIKhAACAAYQ'
+    +'AAADAkAAAAMAkgAAAzBqQ3EAAAADAGpDcgAAAAMAakNyAAAACQA=';
+  noSleepVid.src=src;
+  document.body.appendChild(noSleepVid);
+  noSleepVid.play().catch(function(){});
+}
+function noSleepStop(){
+  if(noSleepVid){noSleepVid.pause();noSleepVid.remove();noSleepVid=null;}
+}
+
+/* Re-acquire after tab comes back to foreground */
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='visible'){
+    if(wk.timerInterval)acquireWakeLock(); // only if workout is running
+  } else {
+    /* releasing is optional; browser releases automatically on hide */
+  }
+});
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('install-banner').classList.add('visible');
+});
+document.getElementById('install-btn').addEventListener('click',async function(){
+  if(!deferredPrompt)return;deferredPrompt.prompt();
+  await deferredPrompt.userChoice;deferredPrompt=null;
+  document.getElementById('install-banner').classList.remove('visible');
+});
+/* FIX #3 — Service Worker: URL.createObjectURL(blob) è bloccato da Chrome 93+ per motivi di
+   sicurezza (scope del blob non corrisponde all'origine della pagina). Per l'offline completo
+   serve un file sw.js separato su HTTPS. Qui manteniamo il tentativo (funziona su Firefox e
+   Android WebView) con fallback silenzioso. */
+if('serviceWorker' in navigator){
+  var swCode="const CACHE='bb-v2';"
+    +"self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll([self.location.pathname]))));"
+    +"self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match(self.location.pathname)))));";
+  try{
+    var swBlob=new Blob([swCode],{type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){
+      /* Chrome 93+: blob SW bloccato — nessun impatto funzionale sull'app */
+    });
+  }catch(e){}
+}
+loadState();
+isMuted=state.isMuted||false;
+var _muteBtn=document.getElementById('mute-btn');
+if(_muteBtn)_muteBtn.textContent=isMuted?'\uD83D\uDD07':'\uD83D\uDD0A';
+(function(){
+  var sel=document.getElementById('notif-sel');
+  if(!sel)return;
+  for(var h=5;h<=23;h++){
+    var opt=document.createElement('option');
+    opt.value=h;opt.textContent=(h<10?'0':'')+h+':00';
+    if(h===(state.notifHour>=0?state.notifHour:8))opt.selected=true;
+    sel.appendChild(opt);
+  }
+  scheduleNotif();
+})();
+renderHome();
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone;
+if(isIOS)setTimeout(function(){showToast('\uD83D\uDCF1 Su iOS: Condividi \u2192 "Aggiungi a Home"');},2500);
+</script>
+</body>
+</html>
